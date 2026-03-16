@@ -118,7 +118,8 @@ func main() {
 				continue
 			}
 			if err := validate.ValidateRelayURL(r); err != nil {
-				fatal("invalid relay: %v", err)
+				fmt.Fprintf(os.Stderr, "Warning: skipping invalid relay %q: %v\n", r, err)
+				continue
 			}
 			relayList = append(relayList, r)
 		}
