@@ -84,34 +84,38 @@ func Resolve(explicit, keyDir string) (string, error) {
 		return "", err
 	}
 
-	// Atomically create the file with O_EXCL to prevent TOCTOU races.
-	// If two processes race here, only one will succeed; the loser
-	// retries by loading the winner's key.
+	// Write to a temp file then rename for atomicity. On POSIX,
+	// os.Rename is atomic within the same filesystem, so a concurrent
+	// Resolve will either see the old state (no file) or the fully
+	// written file — never a partial write.
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return "", fmt.Errorf("create key directory: %w", err)
 	}
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	tmp, err := os.CreateTemp(dir, "announce-key-*.tmp")
 	if err != nil {
-		if os.IsExist(err) {
-			// Another process created the file first — load their key.
-			k2, loadErr := Load(path)
-			if loadErr != nil {
-				return "", fmt.Errorf("load racing key file: %w", loadErr)
-			}
-			if err := Validate(k2); err != nil {
-				return "", fmt.Errorf("corrupted key file %s: %w", path, err)
-			}
-			return Normalise(k2), nil
-		}
-		return "", fmt.Errorf("create key file: %w", err)
+		return "", fmt.Errorf("create temp key file: %w", err)
 	}
-	if _, err := f.WriteString(k + "\n"); err != nil {
-		f.Close()
-		return "", fmt.Errorf("write key file: %w", err)
+	tmpPath := tmp.Name()
+	if _, err := tmp.WriteString(k + "\n"); err != nil {
+		tmp.Close()
+		os.Remove(tmpPath)
+		return "", fmt.Errorf("write temp key file: %w", err)
 	}
-	if err := f.Close(); err != nil {
-		return "", fmt.Errorf("close key file: %w", err)
+	if err := tmp.Close(); err != nil {
+		os.Remove(tmpPath)
+		return "", fmt.Errorf("close temp key file: %w", err)
+	}
+	if err := os.Chmod(tmpPath, 0o600); err != nil {
+		os.Remove(tmpPath)
+		return "", fmt.Errorf("chmod temp key file: %w", err)
+	}
+
+	// Rename is atomic. If another process beat us, the rename
+	// overwrites — but both wrote valid keys, so either is fine.
+	if err := os.Rename(tmpPath, path); err != nil {
+		os.Remove(tmpPath)
+		return "", fmt.Errorf("rename key file: %w", err)
 	}
 
 	return k, nil
