@@ -72,3 +72,63 @@ func TestValidatePublicURL(t *testing.T) {
 		t.Error("expected ftp:// to be rejected")
 	}
 }
+
+func TestIsPrivateHost_ReservedRanges(t *testing.T) {
+	reserved := []string{
+		"100.64.0.1",    // CGNAT
+		"100.127.255.1", // CGNAT upper
+		"198.18.0.1",    // Benchmarking
+		"198.19.0.1",    // Benchmarking
+		"192.0.2.1",     // TEST-NET-1
+		"198.51.100.1",  // TEST-NET-2
+		"203.0.113.1",   // TEST-NET-3
+		"192.0.0.1",     // IETF protocol assignments
+		"192.88.99.1",   // 6to4 relay
+		"240.0.0.1",     // Future use
+		"255.255.255.254",
+	}
+	for _, host := range reserved {
+		if !IsPrivateHost(host) {
+			t.Errorf("expected %q to be private (reserved)", host)
+		}
+	}
+}
+
+func TestIsPrivateHost_IPv6MappedIPv4(t *testing.T) {
+	mapped := []string{
+		"::ffff:127.0.0.1",
+		"::ffff:10.0.0.1",
+		"::ffff:192.168.1.1",
+	}
+	for _, host := range mapped {
+		if !IsPrivateHost(host) {
+			t.Errorf("expected %q to be private (IPv6 mapped IPv4)", host)
+		}
+	}
+}
+
+func TestValidateRelayURL(t *testing.T) {
+	valid := []string{
+		"wss://relay.damus.io",
+		"ws://localhost:7777",
+		"wss://nos.lol",
+	}
+	for _, u := range valid {
+		if err := ValidateRelayURL(u); err != nil {
+			t.Errorf("expected %q to be valid relay URL, got: %v", u, err)
+		}
+	}
+
+	invalid := []string{
+		"http://relay.damus.io",
+		"https://relay.damus.io",
+		"ftp://relay.damus.io",
+		"not-a-url",
+		"wss://",
+	}
+	for _, u := range invalid {
+		if err := ValidateRelayURL(u); err == nil {
+			t.Errorf("expected %q to be rejected as invalid relay URL", u)
+		}
+	}
+}
