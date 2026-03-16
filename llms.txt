@@ -1,0 +1,65 @@
+# aperture-announce
+
+> Running an L402-gated API behind Aperture but AI agents can't find it?
+> aperture-announce reads your Aperture YAML config and publishes kind 31402
+> Nostr events so agents can discover, pay for, and consume your service.
+
+aperture-announce is a standalone Go binary for Aperture operators who want
+their L402 services discoverable by AI agents. Point it at your existing
+aperture.yaml, specify your relays, and your services appear in
+`l402_search` results via 402-mcp. Unlike 402-announce (the TypeScript
+equivalent), this tool requires no Node.js runtime — it's a single binary
+that reads Aperture's native config format directly.
+
+## Getting Started
+
+```bash
+go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@latest
+
+aperture-announce \
+  --config /path/to/aperture.yaml \
+  --relays wss://relay.damus.io,wss://nos.lol \
+  --public-url https://api.example.com
+```
+
+Preview without publishing:
+
+```bash
+aperture-announce --config aperture.yaml --public-url https://api.example.com --dry-run
+```
+
+## Key Concepts
+
+- **Kind 31402 events** — replaceable Nostr events that advertise L402 services with pricing, capabilities, and payment method tags.
+- **Aperture config parsing** — reads the `services` block from Aperture's YAML, extracting names, paths, prices, and capabilities.
+- **Announce key** — a Nostr signing key, auto-generated and persisted to `~/.aperture-announce/announce.key` if not provided.
+- **Relay publishing** — publishes to multiple relays concurrently; supports one-shot or interval-based re-publishing.
+
+## API Surface
+
+This is a CLI tool, not a library. The main commands:
+
+```
+aperture-announce [flags]
+
+Required:
+  --config <path>        Path to Aperture YAML config
+  --relays <urls>        Comma-separated Nostr relay URLs
+  --public-url <url>     Public URL agents will use to reach your service
+
+Optional:
+  --announce-key <hex>   Nostr signing key (auto-generated if omitted)
+  --interval <duration>  Re-publish interval (e.g. 6h); default: one-shot
+  --picture <url>        Service icon URL
+  --dry-run              Print event JSON without publishing
+  --verbose              Verbose logging
+```
+
+Environment variable fallbacks: `APERTURE_CONFIG`, `ANNOUNCE_RELAYS`, `PUBLIC_URL`, `ANNOUNCE_KEY`.
+
+## Optional
+
+- [402-mcp](https://github.com/TheCryptoDonkey/402-mcp) — MCP client that discovers and pays for L402 APIs
+- [402-announce](https://github.com/TheCryptoDonkey/402-announce) — TypeScript equivalent of this tool
+- [toll-booth](https://github.com/TheCryptoDonkey/toll-booth) — Alternative L402 middleware
+- [Aperture](https://github.com/lightninglabs/aperture) — The L402 reverse proxy this tool announces
