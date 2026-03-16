@@ -25,6 +25,7 @@ func main() {
 	picture := flag.String("picture", "", "Optional service icon URL")
 	dryRun := flag.Bool("dry-run", false, "Print event JSON without publishing")
 	verbose := flag.Bool("verbose", false, "Verbose logging")
+	topics := flag.String("topics", "", "Comma-separated custom topic tags (appended to defaults)")
 	flag.Parse()
 
 	// Env var fallbacks
@@ -39,6 +40,9 @@ func main() {
 	}
 	if *announceKey == "" {
 		*announceKey = os.Getenv("ANNOUNCE_KEY")
+	}
+	if *topics == "" {
+		*topics = os.Getenv("ANNOUNCE_TOPICS")
 	}
 
 	// Validate required flags
@@ -86,14 +90,17 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Parsed %d service(s) from %s\n", len(cfg.Services), *configPath)
 	}
 
-	// Warn about dynamic pricing — announced prices may not reflect actual costs.
+	// Warn about dynamic pricing and unrecognised auth values.
 	for _, svc := range cfg.Services {
 		if svc.DynamicPrice {
 			if svc.Price > 0 {
 				fmt.Fprintf(os.Stderr, "Warning: service %q uses dynamic pricing — announced price of %d sats is the static fallback; actual price is determined at request time\n", svc.Name, svc.Price)
 			} else {
-				fmt.Fprintf(os.Stderr, "Warning: service %q uses dynamic pricing with no static price — announced price of 0 sats may not reflect actual cost\n", svc.Name)
+				fmt.Fprintf(os.Stderr, "Warning: service %q uses dynamic pricing with no static fallback — price tag omitted from announcement\n", svc.Name)
 			}
+		}
+		if svc.Auth != "" && !isRecognisedAuth(svc.Auth) {
+			fmt.Fprintf(os.Stderr, "Warning: service %q has unrecognised auth value %q — treating as \"on\" (payment required)\n", svc.Name, svc.Auth)
 		}
 	}
 
@@ -108,11 +115,22 @@ func main() {
 		fatal("key: %v", err)
 	}
 
+	var topicList []string
+	if *topics != "" {
+		for _, t := range strings.Split(*topics, ",") {
+			t = strings.TrimSpace(t)
+			if t != "" {
+				topicList = append(topicList, t)
+			}
+		}
+	}
+
 	// Build and publish (loop or one-shot)
 	run := func() {
 		ev, err := announce.BuildEvent(sk, cfg, announce.BuildOptions{
 			PublicURL: *publicURL,
 			Picture:   *picture,
+			Topics:    topicList,
 		})
 		if err != nil {
 			fatal("build event: %v", err)
@@ -174,6 +192,24 @@ func main() {
 			run()
 		}
 	}
+}
+
+func isRecognisedAuth(auth string) bool {
+	switch strings.ToLower(strings.TrimSpace(auth)) {
+	case "", "on", "true", "off", "false":
+		return true
+	}
+	lower := strings.ToLower(strings.TrimSpace(auth))
+	if strings.HasPrefix(lower, "freebie ") {
+		rest := strings.TrimSpace(lower[len("freebie "):])
+		for _, c := range rest {
+			if c < '0' || c > '9' {
+				return false
+			}
+		}
+		return rest != ""
+	}
+	return false
 }
 
 func fatal(format string, args ...any) {

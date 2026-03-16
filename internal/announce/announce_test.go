@@ -325,6 +325,69 @@ func TestBuildEvent_TimeoutInContent(t *testing.T) {
 	}
 }
 
+func TestBuildEvent_CustomTopics(t *testing.T) {
+	cfg := &config.ApertureConfig{
+		Services: []config.Service{
+			{Name: "api", PathRegexp: "/v1/.*", Price: 100},
+		},
+	}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{
+		PublicURL: "https://api.example.com",
+		Topics:    []string{"ai", "inference", "l402"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assertTag(t, ev, "t", "l402")
+	assertTag(t, ev, "t", "api")
+	assertTag(t, ev, "t", "aperture")
+	assertTag(t, ev, "t", "ai")
+	assertTag(t, ev, "t", "inference")
+
+	// l402 deduped — count total t tags
+	tCount := 0
+	for _, tag := range ev.Tags {
+		if len(tag) >= 1 && tag[0] == "t" {
+			tCount++
+		}
+	}
+	if tCount != 5 {
+		t.Errorf("expected 5 topic tags (l402 deduped), got %d", tCount)
+	}
+}
+
+func TestBuildEvent_TopicCap(t *testing.T) {
+	cfg := &config.ApertureConfig{
+		Services: []config.Service{
+			{Name: "api", PathRegexp: "/v1/.*", Price: 100},
+		},
+	}
+	topics := make([]string, 60)
+	for i := range topics {
+		topics[i] = fmt.Sprintf("topic-%d", i)
+	}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{
+		PublicURL: "https://api.example.com",
+		Topics:    topics,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tCount := 0
+	for _, tag := range ev.Tags {
+		if len(tag) >= 1 && tag[0] == "t" {
+			tCount++
+		}
+	}
+	if tCount > 50 {
+		t.Errorf("topic tags should be capped at 50, got %d", tCount)
+	}
+}
+
 func assertTag(t *testing.T, ev *nostr.Event, key, value string) {
 	t.Helper()
 	for _, tag := range ev.Tags {

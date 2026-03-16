@@ -120,9 +120,6 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 		{"url", opts.PublicURL},
 		{"about", about},
 		{"pmi", "bitcoin-lightning-bolt11"},
-		{"t", "l402"},
-		{"t", "api"},
-		{"t", "aperture"},
 	}
 
 	if opts.Picture != "" {
@@ -178,8 +175,32 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 		}
 	}
 
-	if hasDynamicPricing {
-		tags = append(tags, nostr.Tag{"t", "dynamic-pricing"})
+	// Build topic list: defaults first, then custom, deduplicated, capped at 50
+	const maxTopics = 50
+	defaults := []string{"l402", "api", "aperture"}
+	seen := make(map[string]bool)
+	var allTopics []string
+	for _, t := range defaults {
+		if !seen[t] {
+			seen[t] = true
+			allTopics = append(allTopics, t)
+		}
+	}
+	for _, t := range opts.Topics {
+		t = strings.TrimSpace(t)
+		if t != "" && !seen[t] {
+			seen[t] = true
+			allTopics = append(allTopics, t)
+		}
+	}
+	if hasDynamicPricing && !seen["dynamic-pricing"] {
+		allTopics = append(allTopics, "dynamic-pricing")
+	}
+	if len(allTopics) > maxTopics {
+		allTopics = allTopics[:maxTopics]
+	}
+	for _, topic := range allTopics {
+		tags = append(tags, nostr.Tag{"t", topic})
 	}
 
 	content := eventContent{Capabilities: caps}
