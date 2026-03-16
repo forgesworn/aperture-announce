@@ -66,6 +66,20 @@ func CleanEndpoint(regex string) string {
 	return s
 }
 
+// authForEvent converts Aperture's auth level to the event content value.
+// Returns empty string for default ("on") — omitted via omitempty.
+func authForEvent(auth string) string {
+	switch strings.ToLower(strings.TrimSpace(auth)) {
+	case "off", "false":
+		return "none"
+	case "", "on", "true":
+		return "" // default, omitted
+	default:
+		// "freebie N" or unrecognised — pass through
+		return auth
+	}
+}
+
 // BuildOptions holds optional parameters for event construction.
 type BuildOptions struct {
 	PublicURL string
@@ -140,6 +154,8 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 				if svc.DynamicPrice {
 					cap.Pricing = "dynamic"
 				}
+				cap.Auth = authForEvent(svc.Auth)
+				cap.Timeout = svc.Timeout
 				caps = append(caps, cap)
 			}
 		} else {
@@ -156,6 +172,8 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 			if svc.DynamicPrice {
 				cap.Pricing = "dynamic"
 			}
+			cap.Auth = authForEvent(svc.Auth)
+			cap.Timeout = svc.Timeout
 			caps = append(caps, cap)
 		}
 	}

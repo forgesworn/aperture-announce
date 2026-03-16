@@ -263,6 +263,68 @@ func TestBuildEvent_NameTruncation(t *testing.T) {
 	assertTag(t, ev, "name", "svc-1, svc-2, svc-3 and 4 more")
 }
 
+func TestBuildEvent_AuthInContent(t *testing.T) {
+	cfg := &config.ApertureConfig{
+		Services: []config.Service{
+			{Name: "free-api", PathRegexp: "/v1/free", Price: 1, Auth: "off"},
+			{Name: "paid-api", PathRegexp: "/v1/paid", Price: 100, Auth: "on"},
+			{Name: "freebie-api", PathRegexp: "/v1/freebie", Price: 50, Auth: "freebie 3"},
+		},
+	}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{PublicURL: "https://api.example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var content eventContent
+	if err := json.Unmarshal([]byte(ev.Content), &content); err != nil {
+		t.Fatal(err)
+	}
+	if len(content.Capabilities) != 3 {
+		t.Fatalf("expected 3 capabilities, got %d", len(content.Capabilities))
+	}
+
+	// "off" → "none"
+	if content.Capabilities[0].Auth != "none" {
+		t.Errorf("free-api auth = %q, want %q", content.Capabilities[0].Auth, "none")
+	}
+	// "on" → omitted (empty)
+	if content.Capabilities[1].Auth != "" {
+		t.Errorf("paid-api auth = %q, want empty (default)", content.Capabilities[1].Auth)
+	}
+	// "freebie 3" → "freebie 3"
+	if content.Capabilities[2].Auth != "freebie 3" {
+		t.Errorf("freebie-api auth = %q, want %q", content.Capabilities[2].Auth, "freebie 3")
+	}
+}
+
+func TestBuildEvent_TimeoutInContent(t *testing.T) {
+	cfg := &config.ApertureConfig{
+		Services: []config.Service{
+			{Name: "timed-api", PathRegexp: "/v1/timed", Price: 100, Timeout: 3600},
+			{Name: "untimed-api", PathRegexp: "/v1/untimed", Price: 50},
+		},
+	}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{PublicURL: "https://api.example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var content eventContent
+	if err := json.Unmarshal([]byte(ev.Content), &content); err != nil {
+		t.Fatal(err)
+	}
+
+	if content.Capabilities[0].Timeout != 3600 {
+		t.Errorf("timed-api timeout = %d, want 3600", content.Capabilities[0].Timeout)
+	}
+	if content.Capabilities[1].Timeout != 0 {
+		t.Errorf("untimed-api timeout = %d, want 0 (omitted)", content.Capabilities[1].Timeout)
+	}
+}
+
 func assertTag(t *testing.T, ev *nostr.Event, key, value string) {
 	t.Helper()
 	for _, tag := range ev.Tags {
