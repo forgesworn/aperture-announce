@@ -18,17 +18,22 @@ func Generate() (string, error) {
 	return hex.EncodeToString(b), nil
 }
 
-// Validate checks that a key is a 64-character lowercase hex string.
+// Validate checks that a key is a 64-character hex string (case-insensitive).
 func Validate(k string) error {
 	if len(k) != 64 {
 		return fmt.Errorf("key must be 64 hex characters, got %d", len(k))
 	}
 	for _, c := range k {
-		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
 			return fmt.Errorf("key contains invalid character: %c", c)
 		}
 	}
 	return nil
+}
+
+// Normalise lowercases a hex key for consistent internal use.
+func Normalise(k string) string {
+	return strings.ToLower(k)
 }
 
 // Persist writes a key to a file with 0600 permissions.
@@ -57,7 +62,7 @@ func Resolve(explicit, keyDir string) (string, error) {
 		if err := Validate(explicit); err != nil {
 			return "", fmt.Errorf("invalid explicit key: %w", err)
 		}
-		return explicit, nil
+		return Normalise(explicit), nil
 	}
 
 	path := filepath.Join(keyDir, "announce.key")
@@ -67,7 +72,7 @@ func Resolve(explicit, keyDir string) (string, error) {
 		if err := Validate(k); err != nil {
 			return "", fmt.Errorf("corrupted key file %s: %w", path, err)
 		}
-		return k, nil
+		return Normalise(k), nil
 	}
 
 	// Generate and persist

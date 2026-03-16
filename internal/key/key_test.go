@@ -100,13 +100,18 @@ func TestValidate(t *testing.T) {
 		t.Errorf("valid key rejected: %v", err)
 	}
 
+	// Uppercase hex should be accepted
+	upper := "AABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDD"
+	if err := Validate(upper); err != nil {
+		t.Errorf("uppercase hex rejected: %v", err)
+	}
+
 	invalid := []struct {
 		name string
 		key  string
 	}{
 		{"too short", "abcd"},
 		{"too long", "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddee"},
-		{"uppercase hex", "AABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDD"},
 		{"non-hex chars", "gghhiijjgghhiijjgghhiijjgghhiijjgghhiijjgghhiijjgghhiijjgghhiijj"},
 		{"empty", ""},
 	}
@@ -114,6 +119,18 @@ func TestValidate(t *testing.T) {
 		if err := Validate(tc.key); err == nil {
 			t.Errorf("Validate(%q) [%s]: expected error", tc.key, tc.name)
 		}
+	}
+}
+
+func TestResolve_UppercaseKeyNormalised(t *testing.T) {
+	upper := "AABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDD"
+	resolved, err := Resolve(upper, t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+	if resolved != expected {
+		t.Errorf("expected normalised lowercase, got %q", resolved)
 	}
 }
 
