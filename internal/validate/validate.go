@@ -26,7 +26,11 @@ func IsPrivateHost(host string) bool {
 
 	ip := net.ParseIP(h)
 	if ip == nil {
-		return false // DNS name, not an IP — assume public
+		// DNS name, not an IP — assume public. Note: a DNS name that
+		// resolves to a private IP will bypass this check. Performing DNS
+		// resolution here would introduce network dependency and TOCTOU
+		// (the name could resolve differently at connection time).
+		return false
 	}
 
 	return ip.IsLoopback() ||

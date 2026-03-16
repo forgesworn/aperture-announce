@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net/url"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/TheCryptoDonkey/aperture-announce/internal/announce"
@@ -55,6 +58,9 @@ func main() {
 	if !*dryRun && *relays == "" {
 		fatal("--relays is required (or use --dry-run to preview)")
 	}
+	if *dryRun && *interval > 0 {
+		fatal("--interval and --dry-run cannot be combined")
+	}
 
 	// Validate public URL
 	if err := validate.ValidatePublicURL(*publicURL); err != nil {
@@ -69,17 +75,13 @@ func main() {
 	}
 
 	// Parse config (limit to 1 MB to prevent memory exhaustion from huge files)
-	info, err := os.Stat(*configPath)
+	data, err := os.ReadFile(*configPath)
 	if err != nil {
 		fatal("read config: %v", err)
 	}
 	const maxConfigSize = 1 << 20 // 1 MB
-	if info.Size() > maxConfigSize {
-		fatal("config file too large (%d bytes, max %d)", info.Size(), maxConfigSize)
-	}
-	data, err := os.ReadFile(*configPath)
-	if err != nil {
-		fatal("read config: %v", err)
+	if len(data) > maxConfigSize {
+		fatal("config file too large (%d bytes, max %d)", len(data), maxConfigSize)
 	}
 	cfg, err := config.Parse(data)
 	if err != nil {
@@ -126,6 +128,9 @@ func main() {
 		}
 	}
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	// Build and publish (loop or one-shot)
 	run := func() {
 		ev, err := announce.BuildEvent(sk, cfg, announce.BuildOptions{
@@ -156,12 +161,15 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Warning: skipping invalid relay %q: %v\n", r, err)
 				continue
 			}
+			if u, parseErr := url.Parse(r); parseErr == nil && validate.IsPrivateHost(u.Hostname()) {
+				fmt.Fprintf(os.Stderr, "Warning: relay %q points to a private/loopback address\n", r)
+			}
 			relayList = append(relayList, r)
 		}
 		if len(relayList) == 0 {
 			fatal("no valid relay URLs provided")
 		}
-		results := announce.Publish(context.Background(), ev, relayList)
+		results := announce.Publish(ctx, ev, relayList)
 
 		successCount := 0
 		for _, r := range results {
@@ -186,13 +194,15 @@ func main() {
 	run()
 
 	if *interval > 0 {
-		if *dryRun {
-			fatal("--interval and --dry-run cannot be combined")
-		}
 		ticker := time.NewTicker(*interval)
 		defer ticker.Stop()
-		for range ticker.C {
-			run()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				run()
+			}
 		}
 	}
 }
