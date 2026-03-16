@@ -284,6 +284,19 @@ func TestParseTooManyServices(t *testing.T) {
 	}
 }
 
+func TestParseExcessivePrice(t *testing.T) {
+	data := []byte(`services:
+  - name: "expensive"
+    hostregexp: "example.com"
+    pathregexp: "/v1/.*"
+    price: 99999999999999
+`)
+	_, err := Parse(data)
+	if err == nil {
+		t.Fatal("expected error for excessive price")
+	}
+}
+
 func TestParseAuthUnrecognisedWarns(t *testing.T) {
 	yml := `
 services:

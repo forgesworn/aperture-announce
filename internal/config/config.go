@@ -11,6 +11,9 @@ const (
 	// DefaultServicePrice matches Aperture's default — when no price is
 	// set and dynamic pricing is off, Aperture charges 1 sat.
 	DefaultServicePrice int64 = 1
+
+	// MaxServicePrice matches Aperture's upper bound — 100,000 BTC in satoshis.
+	MaxServicePrice int64 = 10_000_000_000_000
 )
 
 // ApertureConfig holds only the fields we need from Aperture's YAML.
@@ -71,6 +74,9 @@ func Parse(data []byte) (*ApertureConfig, error) {
 		}
 		if rs.Price < 0 {
 			return nil, fmt.Errorf("service %q has negative price: %d", rs.Name, rs.Price)
+		}
+		if rs.Price > MaxServicePrice {
+			return nil, fmt.Errorf("service %q has price %d exceeding maximum (%d sats)", rs.Name, rs.Price, MaxServicePrice)
 		}
 		if rs.Timeout < 0 {
 			return nil, fmt.Errorf("service %q has negative timeout: %d", rs.Name, rs.Timeout)
