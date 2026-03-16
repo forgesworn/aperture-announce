@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	ws "github.com/coder/websocket"
 	"github.com/TheCryptoDonkey/aperture-announce/internal/config"
+	ws "github.com/coder/websocket"
 	"github.com/nbd-wtf/go-nostr"
 )
 
