@@ -145,9 +145,9 @@ func parseRelayURLs(raw string) []string {
 	return relayList
 }
 
-// warnServiceIssues prints warnings for dynamic pricing configurations and
-// unrecognised auth values, mutating cfg to normalise any unknown auth strings.
-func warnServiceIssues(cfg *config.ApertureConfig) {
+// normaliseServiceWarnings prints warnings for dynamic pricing configurations
+// and unrecognised auth values, mutating cfg to normalise any unknown auth strings.
+func normaliseServiceWarnings(cfg *config.ApertureConfig) {
 	for i, svc := range cfg.Services {
 		if svc.DynamicPrice {
 			if svc.Price > 0 {
@@ -234,7 +234,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Parsed %d service(s) from %s\n", len(cfg.Services), f.configPath)
 	}
 
-	warnServiceIssues(cfg)
+	normaliseServiceWarnings(cfg)
 
 	// Resolve key.
 	home, err := os.UserHomeDir()
