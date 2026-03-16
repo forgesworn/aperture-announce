@@ -111,6 +111,9 @@ func ValidatePublicURL(rawURL string) error {
 	if u.Scheme != "http" && u.Scheme != "https" {
 		return fmt.Errorf("URL scheme must be http or https, got %q", u.Scheme)
 	}
+	if u.Hostname() == "" {
+		return fmt.Errorf("URL has no hostname: %s", rawURL)
+	}
 	hostname := u.Hostname()
 	if IsPrivateHost(hostname) {
 		return fmt.Errorf("URL points to a private/loopback address: %s", rawURL)

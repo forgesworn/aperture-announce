@@ -65,6 +65,7 @@ func TestValidatePublicURL(t *testing.T) {
 	}
 
 	require.Error(t, ValidatePublicURL("ftp://example.com"))
+	require.Error(t, ValidatePublicURL("https://"), "expected empty hostname to be rejected")
 }
 
 func TestIsPrivateHost_ReservedRanges(t *testing.T) {
