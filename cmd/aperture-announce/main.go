@@ -19,6 +19,8 @@ import (
 	"github.com/TheCryptoDonkey/aperture-announce/internal/validate"
 )
 
+var version = "0.1.0"
+
 // flags holds all CLI flag values after parsing and env var fallback resolution.
 type flags struct {
 	configPath  string
@@ -45,7 +47,13 @@ func resolveFlags() flags {
 	dryRun := flag.Bool("dry-run", false, "Print event JSON without publishing")
 	verbose := flag.Bool("verbose", false, "Verbose logging")
 	topics := flag.String("topics", "", "Comma-separated custom topic tags (appended to defaults)")
+	showVersion := flag.Bool("version", false, "Print version and exit")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println("aperture-announce " + version)
+		os.Exit(0)
+	}
 
 	// Env var fallbacks
 	if *configPath == "" {
