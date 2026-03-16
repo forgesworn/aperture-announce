@@ -15,6 +15,10 @@ import (
 // KindL402Announce is the Nostr event kind for L402 service announcements.
 const KindL402Announce = 31402
 
+// pricingDynamic is the value used in capability content to indicate
+// that the price is determined at request time.
+const pricingDynamic = "dynamic"
+
 type capability struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -109,7 +113,7 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 	identifier := "aperture-" + u.Hostname()
 
 	// Build name tag (short) and about tag (full description)
-	var serviceNames []string
+	serviceNames := make([]string, 0, len(cfg.Services))
 	for _, s := range cfg.Services {
 		serviceNames = append(serviceNames, s.Name)
 	}
@@ -165,7 +169,7 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 					Endpoint:    endpoint,
 				}
 				if svc.DynamicPrice {
-					cap.Pricing = "dynamic"
+					cap.Pricing = pricingDynamic
 				}
 				cap.Auth = authForEvent(svc.Auth)
 				cap.Timeout = svc.Timeout
@@ -183,7 +187,7 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 				Endpoint:    endpoint,
 			}
 			if svc.DynamicPrice {
-				cap.Pricing = "dynamic"
+				cap.Pricing = pricingDynamic
 			}
 			cap.Auth = authForEvent(svc.Auth)
 			cap.Timeout = svc.Timeout
