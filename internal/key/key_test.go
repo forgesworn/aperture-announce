@@ -122,6 +122,22 @@ func TestValidate(t *testing.T) {
 	}
 }
 
+func TestValidate_DegenerateKey(t *testing.T) {
+	cases := []struct {
+		name string
+		key  string
+	}{
+		{"all zeros", "0000000000000000000000000000000000000000000000000000000000000000"},
+		{"all f", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"},
+		{"all a", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+	}
+	for _, tc := range cases {
+		if err := Validate(tc.key); err == nil {
+			t.Errorf("Validate(%s): expected error for degenerate key", tc.name)
+		}
+	}
+}
+
 func TestResolve_UppercaseKeyNormalised(t *testing.T) {
 	upper := "AABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDD"
 	resolved, err := Resolve(upper, t.TempDir())

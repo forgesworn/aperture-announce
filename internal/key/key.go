@@ -28,6 +28,18 @@ func Validate(k string) error {
 			return fmt.Errorf("key contains invalid character: %c", c)
 		}
 	}
+	// Reject degenerate keys (all-zero, all-f, etc.) — these have known
+	// public keys and would allow anyone to impersonate the service.
+	allSame := true
+	for i := 1; i < len(k); i++ {
+		if k[i] != k[0] {
+			allSame = false
+			break
+		}
+	}
+	if allSame {
+		return fmt.Errorf("key is degenerate (all identical characters)")
+	}
 	return nil
 }
 
