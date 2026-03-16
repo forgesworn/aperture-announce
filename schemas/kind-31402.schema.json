@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/TheCryptoDonkey/aperture-announce/schemas/kind-31402.schema.json",
+  "title": "Kind 31402 — L402 Service Announcement",
+  "description": "A replaceable Nostr event that advertises an L402-gated service with pricing, capabilities, and payment method metadata.",
+  "type": "object",
+  "required": ["kind", "tags", "content"],
+  "properties": {
+    "kind": {
+      "const": 31402,
+      "description": "Nostr event kind for L402 service announcements."
+    },
+    "tags": {
+      "type": "array",
+      "description": "NIP-01 tag array. Required tags: d, name, url, about, pmi, t, price.",
+      "items": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "contains": {
+        "description": "Must include a 'd' tag for replaceable event identity.",
+        "type": "array",
+        "prefixItems": [{ "const": "d" }, { "type": "string" }]
+      }
+    },
+    "content": {
+      "type": "string",
+      "description": "JSON-encoded capabilities object: {\"capabilities\": [{\"name\", \"description\", \"endpoint\"}]}."
+    }
+  },
+  "definitions": {
+    "d_tag": {
+      "description": "Replaceable event identifier, typically 'aperture-<hostname>'.",
+      "type": "array",
+      "prefixItems": [{ "const": "d" }, { "type": "string" }]
+    },
+    "name_tag": {
+      "description": "Human-readable service description.",
+      "type": "array",
+      "prefixItems": [{ "const": "name" }, { "type": "string" }]
+    },
+    "url_tag": {
+      "description": "Public URL where agents reach the service.",
+      "type": "array",
+      "prefixItems": [{ "const": "url" }, { "type": "string", "format": "uri" }]
+    },
+    "about_tag": {
+      "description": "Service summary, same as name tag.",
+      "type": "array",
+      "prefixItems": [{ "const": "about" }, { "type": "string" }]
+    },
+    "pmi_tag": {
+      "description": "Payment method indicator. Always 'bitcoin-lightning-bolt11' for Aperture.",
+      "type": "array",
+      "prefixItems": [{ "const": "pmi" }, { "const": "bitcoin-lightning-bolt11" }]
+    },
+    "t_tag": {
+      "description": "Topic tag for discoverability (l402, api, aperture).",
+      "type": "array",
+      "prefixItems": [{ "const": "t" }, { "type": "string" }]
+    },
+    "price_tag": {
+      "description": "Positional price tag: [\"price\", capability, amount, currency].",
+      "type": "array",
+      "prefixItems": [
+        { "const": "price" },
+        { "type": "string", "description": "Capability or service name" },
+        { "type": "string", "pattern": "^[0-9]+$", "description": "Price in smallest unit" },
+        { "type": "string", "description": "Currency (e.g. 'sats')" }
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "picture_tag": {
+      "description": "Optional service icon URL.",
+      "type": "array",
+      "prefixItems": [{ "const": "picture" }, { "type": "string", "format": "uri" }]
+    },
+    "content_object": {
+      "description": "The JSON object encoded in the content field.",
+      "type": "object",
+      "properties": {
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "description"],
+            "properties": {
+              "name": { "type": "string", "description": "Capability identifier" },
+              "description": { "type": "string", "description": "Human-readable description" },
+              "endpoint": { "type": "string", "description": "Path regexp for this capability" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

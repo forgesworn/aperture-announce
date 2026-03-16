@@ -19,6 +19,14 @@ aperture-announce \
   --public-url https://api.example.com
 ```
 
+## Why aperture-announce?
+
+If you already run [Aperture](https://github.com/lightninglabs/aperture), this is the simplest way to make your services discoverable by AI agents. Unlike [402-announce](https://github.com/TheCryptoDonkey/402-announce) (TypeScript), aperture-announce:
+
+- **Reads your existing `aperture.yaml` directly** — no separate config to maintain
+- **Single binary, zero runtime dependencies** — no Node.js required
+- **Built for Aperture operators** — understands Aperture's service format natively
+
 ## Usage
 
 ```

@@ -37,6 +37,19 @@ testdata/
 - **Go standard layout** — `cmd/` for binaries, `internal/` for private packages
 - **Commit messages** — `type: description` format (e.g. `feat:`, `fix:`, `docs:`)
 
+## Testing
+
+Tests use Go's standard `testing` package with table-driven patterns. When adding or modifying functionality:
+
+- Add test cases covering both success and error paths
+- Use table-driven tests for functions with multiple input variations
+- Run `go test ./...` — all tests must pass before submitting a PR
+
+## Key documentation
+
+- [Event format guide](docs/event-format.md) — kind 31402 tag semantics and content structure
+- [JSON Schema](schemas/kind-31402.schema.json) — machine-readable event schema
+
 ## Submitting changes
 
 1. Fork the repository
