@@ -60,6 +60,10 @@ func Parse(data []byte) (*ApertureConfig, error) {
 	if len(raw.Services) == 0 {
 		return nil, fmt.Errorf("no services found in aperture config")
 	}
+	const maxServices = 1000
+	if len(raw.Services) > maxServices {
+		return nil, fmt.Errorf("too many services (%d, max %d)", len(raw.Services), maxServices)
+	}
 
 	services := make([]Service, 0, len(raw.Services))
 	for i, rs := range raw.Services {
@@ -68,6 +72,9 @@ func Parse(data []byte) (*ApertureConfig, error) {
 		}
 		if rs.Price < 0 {
 			return nil, fmt.Errorf("service %q has negative price: %d", rs.Name, rs.Price)
+		}
+		if rs.Timeout < 0 {
+			return nil, fmt.Errorf("service %q has negative timeout: %d", rs.Name, rs.Timeout)
 		}
 
 		price := rs.Price

@@ -1,6 +1,9 @@
 package config
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestParseSingleService(t *testing.T) {
 	yml := `
@@ -248,6 +251,36 @@ services:
 	}
 	if cfg.Services[0].Timeout != 3600 {
 		t.Errorf("timeout = %d, want 3600", cfg.Services[0].Timeout)
+	}
+}
+
+func TestParseNegativeTimeout(t *testing.T) {
+	yml := `
+services:
+  - name: "api"
+    hostregexp: "api.example.com"
+    pathregexp: "/v1/.*"
+    price: 100
+    timeout: -1
+`
+	_, err := Parse([]byte(yml))
+	if err == nil {
+		t.Error("expected error for negative timeout")
+	}
+}
+
+func TestParseTooManyServices(t *testing.T) {
+	// Build YAML with 1001 services
+	yml := "services:\n"
+	for i := 0; i < 1001; i++ {
+		yml += "  - name: \"svc-" + fmt.Sprintf("%d", i) + "\"\n"
+		yml += "    hostregexp: \"api.example.com\"\n"
+		yml += "    pathregexp: \"/v1/.*\"\n"
+		yml += "    price: 1\n"
+	}
+	_, err := Parse([]byte(yml))
+	if err == nil {
+		t.Error("expected error for too many services")
 	}
 }
 
