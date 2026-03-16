@@ -2,7 +2,7 @@ module github.com/TheCryptoDonkey/aperture-announce
 
 go 1.24.1
 
-toolchain go1.24.5
+toolchain go1.24.13
 
 require (
 	github.com/coder/websocket v1.8.12
