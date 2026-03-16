@@ -19,13 +19,13 @@ go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@la
 aperture-announce \
   --config /path/to/aperture.yaml \
   --relays wss://relay.damus.io,wss://nos.lol \
-  --public-url https://api.example.com
+  --public-urls https://api.example.com
 ```
 
 Preview without publishing:
 
 ```bash
-aperture-announce --config aperture.yaml --public-url https://api.example.com --dry-run
+aperture-announce --config aperture.yaml --public-urls https://api.example.com --dry-run
 ```
 
 ## Key Concepts
@@ -46,9 +46,10 @@ aperture-announce [flags]
 Required:
   --config <path>        Path to Aperture YAML config
   --relays <urls>        Comma-separated Nostr relay URLs
-  --public-url <url>     Public URL agents will use to reach your service
+  --public-urls <urls>   Comma-separated public URLs agents will use to reach your service (supports multiple transports: clearnet, .onion, Handshake)
 
 Optional:
+  --public-url <url>     Alias for --public-urls (single URL; backwards-compatible)
   --announce-key <hex>   Nostr signing key (auto-generated if omitted)
   --interval <duration>  Re-publish interval (e.g. 6h); default: one-shot
   --picture <url>        Service icon URL
@@ -57,7 +58,7 @@ Optional:
   --verbose              Verbose logging
 ```
 
-Environment variable fallbacks: `APERTURE_CONFIG`, `ANNOUNCE_RELAYS`, `PUBLIC_URL`, `ANNOUNCE_KEY`, `ANNOUNCE_TOPICS`.
+Environment variable fallbacks: `APERTURE_CONFIG`, `ANNOUNCE_RELAYS`, `PUBLIC_URLS`, `PUBLIC_URL` (single-URL alias), `ANNOUNCE_KEY`, `ANNOUNCE_TOPICS`.
 
 ## Kind 31402 Event Format
 

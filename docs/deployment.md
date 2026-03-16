@@ -14,7 +14,7 @@ go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@la
 0 * * * * /home/you/go/bin/aperture-announce \
   --config /etc/aperture/aperture.yaml \
   --relays wss://relay.damus.io,wss://nos.lol \
-  --public-url https://api.example.com
+  --public-urls https://api.example.com
 ```
 
 Kind 31402 events are replaceable — publishing the same service repeatedly just updates the existing event on relays. There is no harm in frequent re-publishing.
@@ -35,7 +35,7 @@ Type=simple
 ExecStart=/usr/local/bin/aperture-announce \
   --config /etc/aperture/aperture.yaml \
   --relays wss://relay.damus.io,wss://nos.lol \
-  --public-url https://api.example.com \
+  --public-urls https://api.example.com \
   --interval 6h
 Restart=on-failure
 RestartSec=30
@@ -63,7 +63,7 @@ All required flags have environment variable fallbacks, useful for containers or
 ```bash
 export APERTURE_CONFIG=/etc/aperture/aperture.yaml
 export ANNOUNCE_RELAYS=wss://relay.damus.io,wss://nos.lol
-export PUBLIC_URL=https://api.example.com
+export PUBLIC_URLS=https://api.example.com
 export ANNOUNCE_KEY=<64-char-hex>   # Optional — auto-generated if omitted
 
 aperture-announce
@@ -87,7 +87,7 @@ docker run --rm \
   aperture-announce \
   --config /config/aperture.yaml \
   --relays wss://relay.damus.io,wss://nos.lol \
-  --public-url https://api.example.com \
+  --public-urls https://api.example.com \
   --interval 6h
 ```
 

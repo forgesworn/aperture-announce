@@ -126,6 +126,15 @@ Using `testdata/sample-conf.yaml`:
 | [402-announce](https://github.com/TheCryptoDonkey/402-announce) | TypeScript equivalent of this tool |
 | [toll-booth](https://github.com/TheCryptoDonkey/toll-booth) | Alternative L402 middleware |
 
+## Support
+
+For issues and feature requests, see [GitHub Issues](https://github.com/TheCryptoDonkey/aperture-announce/issues).
+
+If you find aperture-announce useful, consider sending a tip:
+
+- **Lightning:** `thedonkey@strike.me`
+- **Nostr zaps:** `npub1mgvlrnf5hm9yf0n5mf9nqmvarhvxkc6remu5ec3vf8r0txqkuk7su0e7q2`
+
 ## Licence
 
 [MIT](LICENSE)

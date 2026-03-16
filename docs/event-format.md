@@ -105,6 +105,6 @@ Use `--dry-run` to inspect the event without publishing:
 ```bash
 aperture-announce \
   --config aperture.yaml \
-  --public-url https://api.example.com \
+  --public-urls https://api.example.com \
   --dry-run
 ```

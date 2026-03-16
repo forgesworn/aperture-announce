@@ -54,7 +54,7 @@ Tests use Go's standard `testing` package with table-driven patterns. Run `go te
 ## Dry-run for verification
 
 ```bash
-go run ./cmd/aperture-announce --config testdata/sample-conf.yaml --public-url https://api.example.com --dry-run
+go run ./cmd/aperture-announce --config testdata/sample-conf.yaml --public-urls https://api.example.com --dry-run
 ```
 
 This prints the event JSON without publishing — useful for verifying event structure after changes.
