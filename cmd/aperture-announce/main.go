@@ -57,7 +57,22 @@ func main() {
 		fatal("invalid --public-url: %v", err)
 	}
 
-	// Parse config
+	// Validate picture URL if provided
+	if *picture != "" {
+		if err := validate.ValidatePublicURL(*picture); err != nil {
+			fatal("invalid --picture: %v", err)
+		}
+	}
+
+	// Parse config (limit to 1 MB to prevent memory exhaustion from huge files)
+	info, err := os.Stat(*configPath)
+	if err != nil {
+		fatal("read config: %v", err)
+	}
+	const maxConfigSize = 1 << 20 // 1 MB
+	if info.Size() > maxConfigSize {
+		fatal("config file too large (%d bytes, max %d)", info.Size(), maxConfigSize)
+	}
 	data, err := os.ReadFile(*configPath)
 	if err != nil {
 		fatal("read config: %v", err)
@@ -72,7 +87,10 @@ func main() {
 	}
 
 	// Resolve key
-	home, _ := os.UserHomeDir()
+	home, err := os.UserHomeDir()
+	if err != nil && *announceKey == "" {
+		fatal("cannot determine home directory for key storage (set --announce-key or HOME): %v", err)
+	}
 	keyDir := filepath.Join(home, ".aperture-announce")
 	sk, err := key.Resolve(*announceKey, keyDir)
 	if err != nil {
@@ -93,7 +111,20 @@ func main() {
 			return
 		}
 
-		relayList := strings.Split(*relays, ",")
+		var relayList []string
+		for _, r := range strings.Split(*relays, ",") {
+			r = strings.TrimSpace(r)
+			if r == "" {
+				continue
+			}
+			if err := validate.ValidateRelayURL(r); err != nil {
+				fatal("invalid relay: %v", err)
+			}
+			relayList = append(relayList, r)
+		}
+		if len(relayList) == 0 {
+			fatal("no valid relay URLs provided")
+		}
 		results := announce.Publish(context.Background(), ev, relayList)
 
 		successCount := 0
