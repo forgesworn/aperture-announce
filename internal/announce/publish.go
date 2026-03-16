@@ -3,6 +3,7 @@ package announce
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/nbd-wtf/go-nostr"
@@ -15,21 +16,32 @@ type PublishResult struct {
 	Error   error
 }
 
-// Publish sends a signed event to the given relay URLs.
-// Returns results per relay. Continues on individual failures.
+// Publish sends a signed event to the given relay URLs concurrently.
+// Returns one result per relay. Respects context cancellation.
 func Publish(ctx context.Context, ev *nostr.Event, relays []string) []PublishResult {
-	results := make([]PublishResult, 0, len(relays))
-
-	for _, url := range relays {
-		select {
-		case <-ctx.Done():
-			return results
-		default:
-		}
-		r := publishToRelay(ctx, ev, url)
-		results = append(results, r)
+	if len(relays) == 0 {
+		return nil
 	}
 
+	// Check context before spawning goroutines.
+	select {
+	case <-ctx.Done():
+		return nil
+	default:
+	}
+
+	results := make([]PublishResult, len(relays))
+	var wg sync.WaitGroup
+
+	for i, url := range relays {
+		wg.Add(1)
+		go func(idx int, relay string) {
+			defer wg.Done()
+			results[idx] = publishToRelay(ctx, ev, relay)
+		}(i, url)
+	}
+
+	wg.Wait()
 	return results
 }
 
