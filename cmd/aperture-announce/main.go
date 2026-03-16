@@ -91,7 +91,7 @@ func main() {
 	}
 
 	// Warn about dynamic pricing and unrecognised auth values.
-	for _, svc := range cfg.Services {
+	for i, svc := range cfg.Services {
 		if svc.DynamicPrice {
 			if svc.Price > 0 {
 				fmt.Fprintf(os.Stderr, "Warning: service %q uses dynamic pricing — announced price of %d sats is the static fallback; actual price is determined at request time\n", svc.Name, svc.Price)
@@ -101,6 +101,7 @@ func main() {
 		}
 		if svc.Auth != "" && !isRecognisedAuth(svc.Auth) {
 			fmt.Fprintf(os.Stderr, "Warning: service %q has unrecognised auth value %q — treating as \"on\" (payment required)\n", svc.Name, svc.Auth)
+			cfg.Services[i].Auth = ""
 		}
 	}
 
@@ -139,7 +140,9 @@ func main() {
 		if *dryRun {
 			enc := json.NewEncoder(os.Stdout)
 			enc.SetIndent("", "  ")
-			_ = enc.Encode(ev)
+			if err := enc.Encode(ev); err != nil {
+				fatal("encode event: %v", err)
+			}
 			return
 		}
 

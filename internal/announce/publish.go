@@ -21,6 +21,11 @@ func Publish(ctx context.Context, ev *nostr.Event, relays []string) []PublishRes
 	results := make([]PublishResult, 0, len(relays))
 
 	for _, url := range relays {
+		select {
+		case <-ctx.Done():
+			return results
+		default:
+		}
 		r := publishToRelay(ctx, ev, url)
 		results = append(results, r)
 	}

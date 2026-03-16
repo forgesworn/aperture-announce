@@ -167,11 +167,9 @@ func TestPublish_ContextCancelled(t *testing.T) {
 
 	results := Publish(ctx, ev, []string{"ws://127.0.0.1:1"})
 
-	if len(results) != 1 {
-		t.Fatalf("expected 1 result, got %d", len(results))
-	}
-	if results[0].Success {
-		t.Error("expected failure with cancelled context")
+	// Context already cancelled — should return early without attempting any relay.
+	if len(results) != 0 {
+		t.Fatalf("expected 0 results (early exit), got %d", len(results))
 	}
 }
 
