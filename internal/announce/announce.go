@@ -217,7 +217,9 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 	}
 
 	if err := ev.Sign(secretKey); err != nil {
-		return nil, fmt.Errorf("failed to sign event: %w", err)
+		// Do not wrap with %w — the upstream go-nostr Sign() error may
+		// contain the raw secret key value.
+		return nil, fmt.Errorf("failed to sign event")
 	}
 
 	return &ev, nil
