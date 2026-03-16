@@ -58,8 +58,10 @@ func CleanEndpoint(regex string) string {
 	}
 	s = s[:minIdx]
 
-	// Step 3: clean up
-	if s == "/" || s == "" {
+	// Step 3: clean up — if the result ends with '/' the truncation
+	// removed the only specific path segment, leaving an ambiguous
+	// directory prefix. Return empty rather than mislead agents.
+	if s == "/" || s == "" || strings.HasSuffix(s, "/") {
 		return ""
 	}
 

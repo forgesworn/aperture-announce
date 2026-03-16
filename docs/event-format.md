@@ -19,7 +19,7 @@ Kind 31402 is a **replaceable event** (NIP-33). The `d` tag serves as the unique
 | `price` | `["price", "<cap>", "<amount>", "<currency>"]` | Positional price tag per capability. Omitted for dynamically priced capabilities with no static fallback |
 | `picture` | `["picture", "<url>"]` | Optional service icon URL |
 
-The `endpoint` field in capabilities is now a **cleaned base path** (e.g. `/v1/loop`) derived from the Aperture `pathregexp`, not the raw regexp string.
+The `endpoint` field in capabilities is a **best-effort base path** (e.g. `/v1/status`) derived from the Aperture `pathregexp`. When the path pattern contains alternation or is otherwise ambiguous, the field is omitted rather than emitting a misleading partial path. Agents should treat this as a hint, not a contract.
 
 ### Price tags
 
@@ -42,20 +42,18 @@ The `content` field contains a JSON-encoded object listing capabilities with the
     {
       "name": "quote",
       "description": "quote via loop-rpc",
-      "endpoint": "/v1/loop",
       "auth": "none",
       "timeout": 3600
     },
     {
       "name": "swap",
       "description": "swap via loop-rpc",
-      "endpoint": "/v1/loop",
       "pricing": "dynamic"
     },
     {
-      "name": "pool-rpc",
-      "description": "Access pool-rpc",
-      "endpoint": "/v1/pool",
+      "name": "status",
+      "description": "Access status",
+      "endpoint": "/v1/status",
       "auth": "freebie 5"
     }
   ]

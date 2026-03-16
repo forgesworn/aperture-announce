@@ -88,7 +88,7 @@
             "properties": {
               "name": { "type": "string", "description": "Capability identifier" },
               "description": { "type": "string", "description": "Human-readable description" },
-              "endpoint": { "type": "string", "description": "Cleaned base path for this capability (e.g. /v1/loop)" },
+              "endpoint": { "type": "string", "description": "Best-effort base path hint for this capability (e.g. /v1/status). Omitted when the path pattern is ambiguous." },
               "pricing": {
                 "type": "string",
                 "enum": ["dynamic"],

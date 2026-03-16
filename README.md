@@ -109,7 +109,7 @@ Using `testdata/sample-conf.yaml`:
     ["price", "swap", "500", "sats"],
     ["price", "pool-rpc", "1000", "sats"]
   ],
-  "content": "{\"capabilities\":[{\"name\":\"quote\",\"description\":\"quote via loop-rpc\",\"endpoint\":\"/v1/loop/\"},{\"name\":\"swap\",\"description\":\"swap via loop-rpc\",\"endpoint\":\"/v1/loop/\"},{\"name\":\"pool-rpc\",\"description\":\"Access pool-rpc\",\"endpoint\":\"/v1/pool/\"}]}"
+  "content": "{\"capabilities\":[{\"name\":\"quote\",\"description\":\"quote via loop-rpc\"},{\"name\":\"swap\",\"description\":\"swap via loop-rpc\"},{\"name\":\"pool-rpc\",\"description\":\"Access pool-rpc\"}]}"
 }
 ```
 

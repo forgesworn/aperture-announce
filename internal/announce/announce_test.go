@@ -132,6 +132,7 @@ func TestBuildEvent_EndpointsCleaned(t *testing.T) {
 	cfg := &config.ApertureConfig{
 		Services: []config.Service{
 			{Name: "api", PathRegexp: "^/v1/loop/.*$", Price: 100},
+			{Name: "exact", PathRegexp: "^/v1/status$", Price: 50},
 		},
 	}
 	sk := nostr.GeneratePrivateKey()
@@ -144,8 +145,13 @@ func TestBuildEvent_EndpointsCleaned(t *testing.T) {
 	if err := json.Unmarshal([]byte(ev.Content), &content); err != nil {
 		t.Fatal(err)
 	}
-	if content.Capabilities[0].Endpoint != "/v1/loop/" {
-		t.Errorf("endpoint = %q, want %q", content.Capabilities[0].Endpoint, "/v1/loop/")
+	// Trailing-slash result is ambiguous — omitted.
+	if content.Capabilities[0].Endpoint != "" {
+		t.Errorf("endpoint = %q, want empty (ambiguous trailing slash)", content.Capabilities[0].Endpoint)
+	}
+	// Exact path is preserved.
+	if content.Capabilities[1].Endpoint != "/v1/status" {
+		t.Errorf("endpoint = %q, want %q", content.Capabilities[1].Endpoint, "/v1/status")
 	}
 }
 
@@ -207,10 +213,10 @@ func TestCleanEndpoint(t *testing.T) {
 		input string
 		want  string
 	}{
-		{"^/v1/loop/.*$", "/v1/loop/"},
-		{"/v1/pool/.*", "/v1/pool/"},
+		{"^/v1/loop/.*$", ""},
+		{"/v1/pool/.*", ""},
 		{"^/looprpc.SwapServer/LoopOutTerms.*$", "/looprpc.SwapServer/LoopOutTerms"},
-		{"^/v1/(quote|swap)/.*$", "/v1/"},
+		{"^/v1/(quote|swap)/.*$", ""},
 		{"^/.*$", ""},
 		{".*", ""},
 		{"", ""},
@@ -220,6 +226,8 @@ func TestCleanEndpoint(t *testing.T) {
 		{"/v1/data{2,5}", "/v1/data"},
 		{"/v1/users[0-9]+", "/v1/users"},
 		{"/v1/exact", "/v1/exact"},
+		{"/api/v2/(users|admin)", ""},
+		{"^/v1/loop/specific(opt)?$", "/v1/loop/specific"},
 	}
 	for _, tc := range tests {
 		got := CleanEndpoint(tc.input)
