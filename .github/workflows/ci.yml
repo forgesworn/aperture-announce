@@ -20,9 +20,11 @@ jobs:
           go-version: '1.24'
 
       - name: Install golangci-lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.5
 
       - run: go build ./cmd/aperture-announce
       - run: go test ./...
+      - name: Race detector (packages without go-nostr relay calls)
+        run: go test -race ./internal/config/ ./internal/key/ ./internal/validate/
       - run: go vet ./...
       - run: golangci-lint run ./...

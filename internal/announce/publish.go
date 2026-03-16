@@ -45,6 +45,13 @@ func Publish(ctx context.Context, ev *nostr.Event, relays []string) []PublishRes
 	return results
 }
 
+// publishToRelay connects to a single relay and publishes the event.
+//
+// Note: go-nostr v0.52.3 has a known data race between the background
+// goroutine spawned by RelayConnect (which writes to relay fields during
+// init at relay.go:175) and Close (which reads those fields at relay.go:576).
+// This is an upstream issue — our code is correct but `go test -race` will
+// report a false positive for tests that exercise this path.
 func publishToRelay(ctx context.Context, ev *nostr.Event, url string) PublishResult {
 	rCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
