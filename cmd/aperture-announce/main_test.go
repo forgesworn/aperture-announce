@@ -102,6 +102,21 @@ func TestCLI_DryRun(t *testing.T) {
 		t.Error("missing price tag")
 	}
 
+	// Check name tag has short form (not full about string)
+	for _, tag := range tags {
+		arr, ok := tag.([]interface{})
+		if !ok || len(arr) < 2 {
+			continue
+		}
+		key, _ := arr[0].(string)
+		if key == "name" {
+			val, _ := arr[1].(string)
+			if val != "loop-rpc, pool-rpc" {
+				t.Errorf("name tag = %q, want %q", val, "loop-rpc, pool-rpc")
+			}
+		}
+	}
+
 	// Verify content is valid JSON with capabilities
 	content, ok := ev["content"].(string)
 	if !ok {
@@ -208,5 +223,89 @@ func TestCLI_EnvVarFallback(t *testing.T) {
 	kind, ok := ev["kind"].(float64)
 	if !ok || int(kind) != 31402 {
 		t.Errorf("kind = %v, want 31402", ev["kind"])
+	}
+}
+
+func TestCLI_TopicsFlag(t *testing.T) {
+	bin := buildBinary(t)
+	configPath, _ := filepath.Abs("../../testdata/sample-conf.yaml")
+
+	cmd := exec.Command(bin,
+		"--config", configPath,
+		"--public-url", "https://api.example.com",
+		"--topics", "ai,inference",
+		"--dry-run",
+	)
+	out, err := cmd.Output()
+	if err != nil {
+		if ee, ok := err.(*exec.ExitError); ok {
+			t.Fatalf("exit %d: %s", ee.ExitCode(), ee.Stderr)
+		}
+		t.Fatal(err)
+	}
+
+	outStr := string(out)
+	if !strings.Contains(outStr, `"ai"`) {
+		t.Error("missing custom topic 'ai' in output")
+	}
+	if !strings.Contains(outStr, `"inference"`) {
+		t.Error("missing custom topic 'inference' in output")
+	}
+}
+
+func TestCLI_TopicsEnvVar(t *testing.T) {
+	bin := buildBinary(t)
+	configPath, _ := filepath.Abs("../../testdata/sample-conf.yaml")
+
+	cmd := exec.Command(bin, "--dry-run")
+	cmd.Env = append(os.Environ(),
+		"APERTURE_CONFIG="+configPath,
+		"PUBLIC_URL=https://api.example.com",
+		"ANNOUNCE_TOPICS=custom1,custom2",
+	)
+	out, err := cmd.Output()
+	if err != nil {
+		if ee, ok := err.(*exec.ExitError); ok {
+			t.Fatalf("exit %d: %s", ee.ExitCode(), ee.Stderr)
+		}
+		t.Fatal(err)
+	}
+
+	outStr := string(out)
+	if !strings.Contains(outStr, `"custom1"`) {
+		t.Error("missing env var topic 'custom1'")
+	}
+}
+
+func TestCLI_AuthWarning(t *testing.T) {
+	bin := buildBinary(t)
+
+	configYAML := `
+services:
+  - name: "api"
+    hostregexp: "api.example.com"
+    pathregexp: "/v1/.*"
+    price: 100
+    auth: "maybe"
+`
+	configPath := filepath.Join(t.TempDir(), "aperture.yaml")
+	if err := os.WriteFile(configPath, []byte(configYAML), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	cmd := exec.Command(bin,
+		"--config", configPath,
+		"--public-url", "https://api.example.com",
+		"--dry-run",
+	)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		// Should still succeed (warning, not fatal)
+		if ee, ok := err.(*exec.ExitError); ok && ee.ExitCode() != 0 {
+			t.Fatalf("exit %d: %s", ee.ExitCode(), out)
+		}
+	}
+	if !strings.Contains(string(out), "unrecognised auth") {
+		t.Errorf("expected auth warning in output, got: %s", out)
 	}
 }

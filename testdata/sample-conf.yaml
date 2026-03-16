@@ -3,11 +3,13 @@ listenaddr: "localhost:8081"
 services:
   - name: "loop-rpc"
     hostregexp: "loop.example.com"
-    pathregexp: "/v1/loop/.*"
+    pathregexp: "^/v1/loop/.*$"
     price: 500
     capabilities: "quote,swap"
+    auth: "freebie 3"
+    timeout: 3600
 
   - name: "pool-rpc"
     hostregexp: "pool.example.com"
-    pathregexp: "/v1/pool/.*"
+    pathregexp: "^/v1/pool/.*$"
     price: 1000
