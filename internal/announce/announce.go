@@ -25,6 +25,44 @@ type eventContent struct {
 	Capabilities []capability `json:"capabilities,omitempty"`
 }
 
+// CleanEndpoint strips regex syntax from an Aperture path pattern to produce
+// a usable base path for agents. Returns empty string if no usable path remains.
+func CleanEndpoint(regex string) string {
+	if regex == "" {
+		return ""
+	}
+
+	s := regex
+
+	// Step 1: strip anchors
+	s = strings.TrimPrefix(s, "^")
+	s = strings.TrimSuffix(s, "$")
+
+	// Step 2: truncate at first regex metacharacter
+	cutSet := []string{".*", ".+", "[", "(", "{"}
+	minIdx := len(s)
+	for _, pat := range cutSet {
+		if idx := strings.Index(s, pat); idx != -1 && idx < minIdx {
+			minIdx = idx
+		}
+	}
+	// '?' makes the preceding character optional, so strip it too
+	if idx := strings.Index(s, "?"); idx != -1 && idx < minIdx {
+		minIdx = idx - 1
+		if minIdx < 0 {
+			minIdx = 0
+		}
+	}
+	s = s[:minIdx]
+
+	// Step 3: clean up
+	if s == "/" || s == "" {
+		return ""
+	}
+
+	return s
+}
+
 // BuildEvent creates and signs a kind 31402 Nostr event from an Aperture config.
 func BuildEvent(secretKey string, cfg *config.ApertureConfig, publicURL string, picture string) (*nostr.Event, error) {
 	u, err := url.Parse(publicURL)

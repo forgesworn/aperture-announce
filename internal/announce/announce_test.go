@@ -132,6 +132,33 @@ func TestBuildEvent_SignatureValid(t *testing.T) {
 	}
 }
 
+func TestCleanEndpoint(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"^/v1/loop/.*$", "/v1/loop/"},
+		{"/v1/pool/.*", "/v1/pool/"},
+		{"^/looprpc.SwapServer/LoopOutTerms.*$", "/looprpc.SwapServer/LoopOutTerms"},
+		{"^/v1/(quote|swap)/.*$", "/v1/"},
+		{"^/.*$", ""},
+		{".*", ""},
+		{"", ""},
+		{"/v1/status", "/v1/status"},
+		{"^/v1/status$", "/v1/status"},
+		{"/v1/items?", "/v1/item"},
+		{"/v1/data{2,5}", "/v1/data"},
+		{"/v1/users[0-9]+", "/v1/users"},
+		{"/v1/exact", "/v1/exact"},
+	}
+	for _, tc := range tests {
+		got := CleanEndpoint(tc.input)
+		if got != tc.want {
+			t.Errorf("CleanEndpoint(%q) = %q, want %q", tc.input, got, tc.want)
+		}
+	}
+}
+
 func assertTag(t *testing.T, ev *nostr.Event, key, value string) {
 	t.Helper()
 	for _, tag := range ev.Tags {
