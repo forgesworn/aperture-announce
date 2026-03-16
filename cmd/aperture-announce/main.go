@@ -275,6 +275,15 @@ func main() {
 		Topics:     topicList,
 	}
 
+	// Parse relay URLs once (not on every interval tick).
+	var relayList []string
+	if !f.dryRun {
+		relayList = parseRelayURLs(f.relays)
+		if len(relayList) == 0 {
+			fatal("no valid relay URLs provided")
+		}
+	}
+
 	// Build and publish (loop or one-shot).
 	run := func() {
 		if f.dryRun {
@@ -290,10 +299,6 @@ func main() {
 			return
 		}
 
-		relayList := parseRelayURLs(f.relays)
-		if len(relayList) == 0 {
-			fatal("no valid relay URLs provided")
-		}
 		publishOnce(ctx, sk, cfg, opts, relayList, f.verbose)
 	}
 
