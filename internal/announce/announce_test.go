@@ -65,10 +65,10 @@ func TestBuildEvent_WithCapabilities(t *testing.T) {
 	}
 }
 
-func TestBuildEvent_DynamicPricing(t *testing.T) {
+func TestBuildEvent_DynamicPricingNoPriceTag(t *testing.T) {
 	cfg := &config.ApertureConfig{
 		Services: []config.Service{
-			{Name: "dynamic-api", PathRegexp: "/v1/.*", DynamicPrice: true},
+			{Name: "dynamic-api", PathRegexp: "/v1/.*", DynamicPrice: true, Price: 0},
 		},
 	}
 	sk := nostr.GeneratePrivateKey()
@@ -77,7 +77,76 @@ func TestBuildEvent_DynamicPricing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assertPriceTag(t, ev, "dynamic-api", "0", "sats")
+	// Should NOT have a price tag (dynamic, no fallback)
+	for _, tag := range ev.Tags {
+		if len(tag) >= 1 && tag[0] == "price" {
+			t.Error("dynamic-priced service with no fallback should not have a price tag")
+		}
+	}
+
+	// Should have dynamic-pricing topic tag
+	assertTag(t, ev, "t", "dynamic-pricing")
+
+	// Content should have pricing: "dynamic"
+	var content eventContent
+	if err := json.Unmarshal([]byte(ev.Content), &content); err != nil {
+		t.Fatal(err)
+	}
+	if len(content.Capabilities) != 1 {
+		t.Fatalf("expected 1 capability, got %d", len(content.Capabilities))
+	}
+	if content.Capabilities[0].Pricing != "dynamic" {
+		t.Errorf("pricing = %q, want %q", content.Capabilities[0].Pricing, "dynamic")
+	}
+}
+
+func TestBuildEvent_DynamicPricingWithFallback(t *testing.T) {
+	cfg := &config.ApertureConfig{
+		Services: []config.Service{
+			{Name: "api", PathRegexp: "/v1/.*", DynamicPrice: true, Price: 500},
+		},
+	}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{PublicURL: "https://api.example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Should still have a price tag (static fallback)
+	assertPriceTag(t, ev, "api", "500", "sats")
+
+	// Should have dynamic-pricing topic
+	assertTag(t, ev, "t", "dynamic-pricing")
+
+	// Content should have pricing: "dynamic"
+	var content eventContent
+	if err := json.Unmarshal([]byte(ev.Content), &content); err != nil {
+		t.Fatal(err)
+	}
+	if content.Capabilities[0].Pricing != "dynamic" {
+		t.Errorf("pricing = %q, want %q", content.Capabilities[0].Pricing, "dynamic")
+	}
+}
+
+func TestBuildEvent_EndpointsCleaned(t *testing.T) {
+	cfg := &config.ApertureConfig{
+		Services: []config.Service{
+			{Name: "api", PathRegexp: "^/v1/loop/.*$", Price: 100},
+		},
+	}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{PublicURL: "https://api.example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var content eventContent
+	if err := json.Unmarshal([]byte(ev.Content), &content); err != nil {
+		t.Fatal(err)
+	}
+	if content.Capabilities[0].Endpoint != "/v1/loop/" {
+		t.Errorf("endpoint = %q, want %q", content.Capabilities[0].Endpoint, "/v1/loop/")
+	}
 }
 
 func TestBuildEvent_MultipleServices(t *testing.T) {

@@ -19,6 +19,9 @@ type capability struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Endpoint    string `json:"endpoint,omitempty"`
+	Pricing     string `json:"pricing,omitempty"`
+	Auth        string `json:"auth,omitempty"`
+	Timeout     int64  `json:"timeout,omitempty"`
 }
 
 type eventContent struct {
@@ -113,29 +116,52 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 	}
 
 	var caps []capability
+	hasDynamicPricing := false
 
 	for _, svc := range cfg.Services {
+		endpoint := CleanEndpoint(svc.PathRegexp)
+
+		if svc.DynamicPrice {
+			hasDynamicPricing = true
+		}
+
 		if len(svc.Capabilities) > 0 {
 			for _, capName := range svc.Capabilities {
-				tags = append(tags, nostr.Tag{
-					"price", capName, strconv.FormatInt(svc.Price, 10), "sats",
-				})
-				caps = append(caps, capability{
+				if !svc.DynamicPrice || svc.Price > 0 {
+					tags = append(tags, nostr.Tag{
+						"price", capName, strconv.FormatInt(svc.Price, 10), "sats",
+					})
+				}
+				cap := capability{
 					Name:        capName,
 					Description: fmt.Sprintf("%s via %s", capName, svc.Name),
-					Endpoint:    svc.PathRegexp,
-				})
+					Endpoint:    endpoint,
+				}
+				if svc.DynamicPrice {
+					cap.Pricing = "dynamic"
+				}
+				caps = append(caps, cap)
 			}
 		} else {
-			tags = append(tags, nostr.Tag{
-				"price", svc.Name, strconv.FormatInt(svc.Price, 10), "sats",
-			})
-			caps = append(caps, capability{
+			if !svc.DynamicPrice || svc.Price > 0 {
+				tags = append(tags, nostr.Tag{
+					"price", svc.Name, strconv.FormatInt(svc.Price, 10), "sats",
+				})
+			}
+			cap := capability{
 				Name:        svc.Name,
 				Description: fmt.Sprintf("Access %s", svc.Name),
-				Endpoint:    svc.PathRegexp,
-			})
+				Endpoint:    endpoint,
+			}
+			if svc.DynamicPrice {
+				cap.Pricing = "dynamic"
+			}
+			caps = append(caps, cap)
 		}
+	}
+
+	if hasDynamicPricing {
+		tags = append(tags, nostr.Tag{"t", "dynamic-pricing"})
 	}
 
 	content := eventContent{Capabilities: caps}
