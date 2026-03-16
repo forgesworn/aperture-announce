@@ -28,7 +28,7 @@
       "description": "JSON-encoded capabilities object: {\"capabilities\": [{\"name\", \"description\", \"endpoint\", \"pricing?\", \"auth?\", \"timeout?\"}]}."
     }
   },
-  "definitions": {
+  "$defs": {
     "d_tag": {
       "description": "Replaceable event identifier, typically 'aperture-<hostname>'.",
       "type": "array",
