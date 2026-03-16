@@ -60,6 +60,14 @@ aperture-announce \
 
 Each URL produces a separate `url` tag in the kind 31402 event; agents try them in order.
 
+### Multiple URLs vs multiple events
+
+**Multiple URLs in one event** — pass several `--public-urls` entries when they represent the **same service** on different transports (clearnet, Tor, Handshake). Pricing, credentials, and the macaroon signing key are shared across all URLs. This provides censorship resistance and redundancy.
+
+**Separate kind 31402 events** — run `aperture-announce` again for a genuinely different service (different `--config`, different Aperture backend) when the pricing, capabilities, or availability differ per transport. Each Aperture service should map to its own event with a distinct `d` tag.
+
+In short: same service + different network paths → one event with multiple URL tags. Different services → separate runs, separate events.
+
 ## How it works
 
 1. Reads your `aperture.yaml` and extracts service names, paths, and pricing
