@@ -1,7 +1,7 @@
 # aperture-announce
 
 [![MIT licence](https://img.shields.io/badge/licence-MIT-blue.svg)](./LICENSE)
-[![Go](https://img.shields.io/badge/Go-1.22+-00ADD8)](https://golang.org/)
+[![Go](https://img.shields.io/badge/Go-1.24+-00ADD8)](https://golang.org/)
 [![CI](https://github.com/TheCryptoDonkey/aperture-announce/actions/workflows/ci.yml/badge.svg)](https://github.com/TheCryptoDonkey/aperture-announce/actions/workflows/ci.yml)
 
 Announce your [Aperture](https://github.com/lightninglabs/aperture) L402 services on Nostr for decentralised discovery.
