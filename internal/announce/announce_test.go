@@ -2,6 +2,7 @@ package announce
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/TheCryptoDonkey/aperture-announce/internal/config"
@@ -157,6 +158,40 @@ func TestCleanEndpoint(t *testing.T) {
 			t.Errorf("CleanEndpoint(%q) = %q, want %q", tc.input, got, tc.want)
 		}
 	}
+}
+
+func TestBuildEvent_NameAboutSplit(t *testing.T) {
+	cfg := &config.ApertureConfig{
+		Services: []config.Service{
+			{Name: "loop-rpc", PathRegexp: "/v1/loop/.*", Price: 500},
+			{Name: "pool-rpc", PathRegexp: "/v1/pool/.*", Price: 1000},
+		},
+	}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{PublicURL: "https://api.example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assertTag(t, ev, "name", "loop-rpc, pool-rpc")
+	assertTag(t, ev, "about", "L402-gated API via Aperture — loop-rpc, pool-rpc")
+}
+
+func TestBuildEvent_NameTruncation(t *testing.T) {
+	services := make([]config.Service, 7)
+	for i := range services {
+		services[i] = config.Service{
+			Name: fmt.Sprintf("svc-%d", i+1), PathRegexp: "/", Price: 1,
+		}
+	}
+	cfg := &config.ApertureConfig{Services: services}
+	sk := nostr.GeneratePrivateKey()
+	ev, err := BuildEvent(sk, cfg, BuildOptions{PublicURL: "https://api.example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assertTag(t, ev, "name", "svc-1, svc-2, svc-3 and 4 more")
 }
 
 func assertTag(t *testing.T, ev *nostr.Event, key, value string) {

@@ -79,11 +79,19 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 
 	identifier := "aperture-" + u.Hostname()
 
-	// Build service descriptions for the about tag
+	// Build name tag (short) and about tag (full description)
 	var serviceNames []string
 	for _, s := range cfg.Services {
 		serviceNames = append(serviceNames, s.Name)
 	}
+
+	var name string
+	if len(serviceNames) > 5 {
+		name = strings.Join(serviceNames[:3], ", ") + fmt.Sprintf(" and %d more", len(serviceNames)-3)
+	} else {
+		name = strings.Join(serviceNames, ", ")
+	}
+
 	about := "L402-gated API via Aperture"
 	if len(serviceNames) > 0 {
 		about += " — " + strings.Join(serviceNames, ", ")
@@ -91,7 +99,7 @@ func BuildEvent(secretKey string, cfg *config.ApertureConfig, opts BuildOptions)
 
 	tags := nostr.Tags{
 		{"d", identifier},
-		{"name", about},
+		{"name", name},
 		{"url", opts.PublicURL},
 		{"about", about},
 		{"pmi", "bitcoin-lightning-bolt11"},
