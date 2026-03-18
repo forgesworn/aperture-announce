@@ -344,10 +344,10 @@ publish time is now ~10s regardless of relay count, down from
 
 - [ ] **Step 1: Fix import order**
 
-Swap the `ws` import and `TheCryptoDonkey` import to alphabetical order within the third-party group:
+Swap the `ws` import and `forgesworn` import to alphabetical order within the third-party group:
 
 ```go
-	"github.com/TheCryptoDonkey/aperture-announce/internal/config"
+	"github.com/forgesworn/aperture-announce/internal/config"
 	ws "github.com/coder/websocket"
 	"github.com/nbd-wtf/go-nostr"
 ```

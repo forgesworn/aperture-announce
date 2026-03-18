@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/TheCryptoDonkey/aperture-announce/internal/config"
+	"github.com/forgesworn/aperture-announce/internal/config"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/stretchr/testify/require"
 )

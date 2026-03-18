@@ -13,10 +13,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/TheCryptoDonkey/aperture-announce/internal/announce"
-	"github.com/TheCryptoDonkey/aperture-announce/internal/config"
-	"github.com/TheCryptoDonkey/aperture-announce/internal/key"
-	"github.com/TheCryptoDonkey/aperture-announce/internal/validate"
+	"github.com/forgesworn/aperture-announce/internal/announce"
+	"github.com/forgesworn/aperture-announce/internal/config"
+	"github.com/forgesworn/aperture-announce/internal/key"
+	"github.com/forgesworn/aperture-announce/internal/validate"
 )
 
 var version = "0.1.0"

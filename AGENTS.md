@@ -41,7 +41,7 @@ All application code is in `internal/` — this is a binary, not a library.
 
 ## Event format (critical)
 
-The kind 31402 event must match [402-announce](https://github.com/TheCryptoDonkey/402-announce) output:
+The kind 31402 event must match [402-announce](https://github.com/forgesworn/402-announce) output:
 
 - `pmi` tags for payment method (not `payment`)
 - `price` tags with positional elements: `["price", "capability", "amount", "currency"]` (not JSON)

@@ -5,7 +5,7 @@ Contributions are welcome! This is a small Go project — getting started is str
 ## Setup
 
 ```bash
-git clone https://github.com/TheCryptoDonkey/aperture-announce.git
+git clone https://github.com/forgesworn/aperture-announce.git
 cd aperture-announce
 go build ./cmd/aperture-announce
 ```

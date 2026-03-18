@@ -10,7 +10,7 @@ Aperture requires LND for invoice creation. LND is complex, resource-heavy, and 
 
 ## Approach
 
-Standalone Go module (`github.com/TheCryptoDonkey/aperture-phoenixd`) that implements Aperture's challenger pattern against Phoenixd's REST API. No Aperture import — define matching interfaces with plain Go types to avoid pulling in LND's enormous dependency tree. Ship with an integration guide (a 20-line diff to `aperture.go`) and offer as a PR to `lightninglabs/aperture` later.
+Standalone Go module (`github.com/forgesworn/aperture-phoenixd`) that implements Aperture's challenger pattern against Phoenixd's REST API. No Aperture import — define matching interfaces with plain Go types to avoid pulling in LND's enormous dependency tree. Ship with an integration guide (a 20-line diff to `aperture.go`) and offer as a PR to `lightninglabs/aperture` later.
 
 ## Interfaces
 

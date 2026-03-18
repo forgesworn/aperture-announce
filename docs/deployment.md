@@ -8,7 +8,7 @@ Publish once per hour via cron:
 
 ```bash
 # Install the binary
-go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@latest
+go install github.com/forgesworn/aperture-announce/cmd/aperture-announce@latest
 
 # Add to crontab (crontab -e)
 0 * * * * /home/you/go/bin/aperture-announce \
@@ -73,7 +73,7 @@ aperture-announce
 
 ```dockerfile
 FROM golang:1.24-alpine AS build
-RUN go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@latest
+RUN go install github.com/forgesworn/aperture-announce/cmd/aperture-announce@latest
 
 FROM alpine:3.20
 COPY --from=build /go/bin/aperture-announce /usr/local/bin/

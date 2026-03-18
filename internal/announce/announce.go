@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TheCryptoDonkey/aperture-announce/internal/config"
+	"github.com/forgesworn/aperture-announce/internal/config"
 	"github.com/nbd-wtf/go-nostr"
 )
 

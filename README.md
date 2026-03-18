@@ -2,16 +2,16 @@
 
 [![MIT licence](https://img.shields.io/badge/licence-MIT-blue.svg)](./LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.24+-00ADD8)](https://golang.org/)
-[![CI](https://github.com/TheCryptoDonkey/aperture-announce/actions/workflows/ci.yml/badge.svg)](https://github.com/TheCryptoDonkey/aperture-announce/actions/workflows/ci.yml)
+[![CI](https://github.com/forgesworn/aperture-announce/actions/workflows/ci.yml/badge.svg)](https://github.com/forgesworn/aperture-announce/actions/workflows/ci.yml)
 
 Announce your [Aperture](https://github.com/lightninglabs/aperture) L402 services on Nostr for decentralised discovery.
 
-Reads Aperture's YAML config, extracts service definitions, and publishes [kind 31402](https://github.com/TheCryptoDonkey/402-announce) events to Nostr relays. AI agents using [402-mcp](https://github.com/TheCryptoDonkey/402-mcp) can then discover your services via `l402_search`.
+Reads Aperture's YAML config, extracts service definitions, and publishes [kind 31402](https://github.com/forgesworn/402-announce) events to Nostr relays. AI agents using [402-mcp](https://github.com/forgesworn/402-mcp) can then discover your services via `l402_search`.
 
 ## Quick start
 
 ```bash
-go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@latest
+go install github.com/forgesworn/aperture-announce/cmd/aperture-announce@latest
 
 aperture-announce \
   --config /path/to/aperture.yaml \
@@ -21,7 +21,7 @@ aperture-announce \
 
 ## Why aperture-announce?
 
-If you already run [Aperture](https://github.com/lightninglabs/aperture), this is the simplest way to make your services discoverable by AI agents. Unlike [402-announce](https://github.com/TheCryptoDonkey/402-announce) (TypeScript), aperture-announce:
+If you already run [Aperture](https://github.com/lightninglabs/aperture), this is the simplest way to make your services discoverable by AI agents. Unlike [402-announce](https://github.com/forgesworn/402-announce) (TypeScript), aperture-announce:
 
 - **Reads your existing `aperture.yaml` directly** — no separate config to maintain
 - **Single binary, zero runtime dependencies** — no Node.js required
@@ -122,13 +122,13 @@ Using `testdata/sample-conf.yaml`:
 | Project | Role |
 |---------|------|
 | [aperture](https://github.com/lightninglabs/aperture) | L402 reverse proxy (what you're announcing) |
-| [402-mcp](https://github.com/TheCryptoDonkey/402-mcp) | MCP client that discovers and pays for L402 APIs |
-| [402-announce](https://github.com/TheCryptoDonkey/402-announce) | TypeScript equivalent of this tool |
-| [toll-booth](https://github.com/TheCryptoDonkey/toll-booth) | Alternative L402 middleware |
+| [402-mcp](https://github.com/forgesworn/402-mcp) | MCP client that discovers and pays for L402 APIs |
+| [402-announce](https://github.com/forgesworn/402-announce) | TypeScript equivalent of this tool |
+| [toll-booth](https://github.com/forgesworn/toll-booth) | Alternative L402 middleware |
 
 ## Support
 
-For issues and feature requests, see [GitHub Issues](https://github.com/TheCryptoDonkey/aperture-announce/issues).
+For issues and feature requests, see [GitHub Issues](https://github.com/forgesworn/aperture-announce/issues).
 
 If you find aperture-announce useful, consider sending a tip:
 

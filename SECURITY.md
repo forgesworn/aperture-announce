@@ -4,7 +4,7 @@
 
 If you discover a security vulnerability, please report it privately rather than opening a public issue.
 
-Email: **security@thecryptodonkey.com**
+Email: **security@forgesworn.dev**
 
 You should receive a response within 72 hours. Please include:
 

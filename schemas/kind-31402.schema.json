@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/TheCryptoDonkey/aperture-announce/schemas/kind-31402.schema.json",
+  "$id": "https://github.com/forgesworn/aperture-announce/schemas/kind-31402.schema.json",
   "title": "Kind 31402 — L402 Service Announcement",
   "description": "A replaceable Nostr event that advertises an L402-gated service with pricing, capabilities, and payment method metadata.",
   "type": "object",

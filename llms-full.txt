@@ -14,7 +14,7 @@ that reads Aperture's native config format directly.
 ## Getting Started
 
 ```bash
-go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@latest
+go install github.com/forgesworn/aperture-announce/cmd/aperture-announce@latest
 
 aperture-announce \
   --config /path/to/aperture.yaml \
@@ -154,7 +154,7 @@ When a capability's price is determined at request time rather than statically:
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/TheCryptoDonkey/aperture-announce/schemas/kind-31402.schema.json",
+  "$id": "https://github.com/forgesworn/aperture-announce/schemas/kind-31402.schema.json",
   "title": "Kind 31402 — L402 Service Announcement",
   "description": "A replaceable Nostr event that advertises an L402-gated service with pricing, capabilities, and payment method metadata.",
   "type": "object",
@@ -283,7 +283,7 @@ Using a sample Aperture config with two services (loop-rpc and pool-rpc):
 
 ## Ecosystem
 
-- [402-mcp](https://github.com/TheCryptoDonkey/402-mcp) — MCP client that discovers and pays for L402 APIs
-- [402-announce](https://github.com/TheCryptoDonkey/402-announce) — TypeScript equivalent of this tool
-- [toll-booth](https://github.com/TheCryptoDonkey/toll-booth) — Alternative L402 middleware
+- [402-mcp](https://github.com/forgesworn/402-mcp) — MCP client that discovers and pays for L402 APIs
+- [402-announce](https://github.com/forgesworn/402-announce) — TypeScript equivalent of this tool
+- [toll-booth](https://github.com/forgesworn/toll-booth) — Alternative L402 middleware
 - [Aperture](https://github.com/lightninglabs/aperture) — The L402 reverse proxy this tool announces

@@ -1,6 +1,6 @@
 # Kind 31402 Event Format
 
-This document describes the Nostr event structure that aperture-announce produces. The format matches [402-announce](https://github.com/TheCryptoDonkey/402-announce) so that both tools produce interchangeable events.
+This document describes the Nostr event structure that aperture-announce produces. The format matches [402-announce](https://github.com/forgesworn/402-announce) so that both tools produce interchangeable events.
 
 ## Event structure
 

@@ -31,7 +31,7 @@ cd /Users/darren/WebstormProjects/aperture-phoenixd
 - [ ] **Step 2: Initialise Go module**
 
 ```bash
-go mod init github.com/TheCryptoDonkey/aperture-phoenixd
+go mod init github.com/forgesworn/aperture-phoenixd
 ```
 
 - [ ] **Step 3: Create doc.go**
@@ -80,7 +80,7 @@ cmd/echo-server/       # Minimal demo API for Aperture to proxy
 
 - [ ] **Step 5: Create LICENSE (MIT)**
 
-Use standard MIT licence text with `Copyright (c) 2026 TheCryptoDonkey`.
+Use standard MIT licence text with `Copyright (c) 2026 forgesworn`.
 
 - [ ] **Step 6: Create .golangci.yml**
 
@@ -634,7 +634,7 @@ Implements Aperture's `mint.Challenger` and `auth.InvoiceChecker` interfaces aga
 ## Quick start
 
 ```go
-import "github.com/TheCryptoDonkey/aperture-phoenixd"
+import "github.com/forgesworn/aperture-phoenixd"
 
 challenger := phoenixd.NewChallenger("http://localhost:9740", "your-phoenixd-password")
 

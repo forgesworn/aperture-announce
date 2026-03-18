@@ -14,7 +14,7 @@ that reads Aperture's native config format directly.
 ## Getting Started
 
 ```bash
-go install github.com/TheCryptoDonkey/aperture-announce/cmd/aperture-announce@latest
+go install github.com/forgesworn/aperture-announce/cmd/aperture-announce@latest
 
 aperture-announce \
   --config /path/to/aperture.yaml \
@@ -63,7 +63,7 @@ Environment variable fallbacks: `APERTURE_CONFIG`, `ANNOUNCE_RELAYS`, `PUBLIC_UR
 
 ## Optional
 
-- [402-mcp](https://github.com/TheCryptoDonkey/402-mcp) — MCP client that discovers and pays for L402 APIs
-- [402-announce](https://github.com/TheCryptoDonkey/402-announce) — TypeScript equivalent of this tool
-- [toll-booth](https://github.com/TheCryptoDonkey/toll-booth) — Alternative L402 middleware
+- [402-mcp](https://github.com/forgesworn/402-mcp) — MCP client that discovers and pays for L402 APIs
+- [402-announce](https://github.com/forgesworn/402-announce) — TypeScript equivalent of this tool
+- [toll-booth](https://github.com/forgesworn/toll-booth) — Alternative L402 middleware
 - [Aperture](https://github.com/lightninglabs/aperture) — The L402 reverse proxy this tool announces

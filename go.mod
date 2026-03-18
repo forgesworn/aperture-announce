@@ -1,4 +1,4 @@
-module github.com/TheCryptoDonkey/aperture-announce
+module github.com/forgesworn/aperture-announce
 
 go 1.24.1
 
