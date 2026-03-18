@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/forgesworn/aperture-announce/internal/config"
 	ws "github.com/coder/websocket"
+	"github.com/forgesworn/aperture-announce/internal/config"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/stretchr/testify/require"
 )
