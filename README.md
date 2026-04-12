@@ -5,6 +5,7 @@
 [![MIT licence](https://img.shields.io/badge/licence-MIT-blue.svg)](./LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.24+-00ADD8)](https://golang.org/)
 [![CI](https://github.com/forgesworn/aperture-announce/actions/workflows/ci.yml/badge.svg)](https://github.com/forgesworn/aperture-announce/actions/workflows/ci.yml)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/TheCryptoDonkey?logo=githubsponsors&color=ea4aaa&label=Sponsor)](https://github.com/sponsors/TheCryptoDonkey)
 
 Announce your [Aperture](https://github.com/lightninglabs/aperture) L402 services on Nostr for decentralised discovery.
 
