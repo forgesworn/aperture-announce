@@ -5,7 +5,7 @@ go 1.24.1
 toolchain go1.24.13
 
 require (
-	github.com/coder/websocket v1.8.12
+	github.com/coder/websocket v1.8.14
 	github.com/goccy/go-yaml v1.19.2
 	github.com/nbd-wtf/go-nostr v0.52.3
 	github.com/stretchr/testify v1.11.1
