@@ -48,7 +48,7 @@ func TestIsPrivateHost(t *testing.T) {
 func TestValidatePublicURL(t *testing.T) {
 	valid := []string{
 		"https://api.example.com",
-		"https://satgate.trotters.dev",
+		"https://satgate.forgesworn.dev",
 		"http://api.example.com:8080",
 	}
 	for _, u := range valid {
