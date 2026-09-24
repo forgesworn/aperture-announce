@@ -1,4 +1,4 @@
-# AGENTS.md — aperture-announce
+# AGENTS.md - aperture-announce
 
 AI agent instructions for working with this repository.
 
@@ -30,14 +30,14 @@ testdata/
   sample-conf.yaml                 # Example Aperture config for tests
 ```
 
-All application code is in `internal/` — this is a binary, not a library.
+All application code is in `internal/`: this is a binary, not a library.
 
 ## Conventions
 
-- **British English** — colour, initialise, behaviour, licence
-- **Go standard layout** — `cmd/` for binaries, `internal/` for private packages
-- **Commit messages** — `type: description` format (e.g. `feat:`, `fix:`, `docs:`)
-- **No Co-Authored-By lines** in commits
+- British English: colour, initialise, behaviour, licence.
+- Go standard layout: `cmd/` for binaries, `internal/` for private packages.
+- Commit messages: `type: description` format (e.g. `feat:`, `fix:`, `docs:`).
+- No Co-Authored-By lines in commits.
 
 ## Event format (critical)
 
@@ -57,4 +57,16 @@ Tests use Go's standard `testing` package with table-driven patterns. Run `go te
 go run ./cmd/aperture-announce --config testdata/sample-conf.yaml --public-urls https://api.example.com --dry-run
 ```
 
-This prints the event JSON without publishing — useful for verifying event structure after changes.
+This prints the event JSON without publishing: useful for verifying event structure after changes.
+
+## Key dependencies
+
+- `github.com/nbd-wtf/go-nostr`: Nostr event signing and relay publishing.
+- `github.com/goccy/go-yaml`: YAML parsing for Aperture config.
+- `github.com/coder/websocket`: WebSocket transport for relay connections.
+
+## Pitfalls
+
+- go-nostr v0.52.3 has a known data race between RelayConnect and Close; our code is correct but `go test -race` reports a false positive for relay tests. Race detector is only run on packages without relay calls.
+- The `content` field is JSON-encoded as a string, not a raw object. Agents parse it after receiving the event.
+- `CleanEndpoint` strips regex syntax from Aperture path patterns; the result is a best-effort base path, not a contract.
