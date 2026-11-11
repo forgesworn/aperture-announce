@@ -1,7 +1,21 @@
 version: 2
 
-# Canonical dependabot config for Go repos in forgesworn (aperture-*).
-# Synced from forgesworn/.github/templates/dependabot/dependabot.gomod.yml.
+# Canonical dependabot config for forgesworn repos.
+# COMPOSED by templates/dependabot/propagate.sh from one fragment per ecosystem
+# the repo actually contains, plus the shared github-actions block.
+# Edit the fragments, not individual repos -- then run the propagator to sync.
+#
+# Tiering:
+#   patch + minor        -> grouped, auto-merged on green CI
+#   major                -> individual PR, manual review
+#   peer-locked families -> grouped across ALL update types, still manual review
+#   TS / Node / framework majors -> ignored, upgraded deliberately
+#
+# "Peer-locked family" means a set of packages that pin each other's exact
+# version. Bumped one at a time they can never install or build, so the PRs sit
+# failing forever and the failure looks like the dependency's fault rather than
+# this file's. vitest/@vitest/*, @noble/*, and the RustCrypto digest family are
+# all in that category.
 
 updates:
   - package-ecosystem: gomod
