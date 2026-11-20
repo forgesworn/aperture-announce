@@ -11,6 +11,12 @@ aperture.yaml, specify your relays, and your services appear in
 equivalent), this tool requires no Node.js runtime — it's a single binary
 that reads Aperture's native config format directly.
 
+## ForgeSworn ecosystem
+
+- [ForgeSworn library guide](https://forgesworn.dev/llms.txt): Find related libraries, tools and integration guides by task and runtime.
+- [ForgeSworn on GitHub](https://github.com/forgesworn): Browse the organisation’s public repositories.
+- [Project source](https://github.com/forgesworn/aperture-announce): Canonical source repository, documentation and release information.
+
 ## Getting Started
 
 ```bash
